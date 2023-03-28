@@ -23,6 +23,7 @@ useEffect(()=>{
     for(const id in storeCart){
         // step 2: get product form products state by using id 
       const addedProduct  = products.find(product => product.id === id);
+  
      if(addedProduct){
         // step 3: add quantity 
         const quantity = storeCart[id];
@@ -37,7 +38,20 @@ useEffect(()=>{
 },[products])
 
     const handleAddToCart = (product) =>{
-        const newCart = [...cart, product]
+        let newCart = [];
+        // if product doesn't exist in the cart, then set quantity = 1
+        // if exsit update quantity by 1 
+      //   3. quantity 
+     const exists = cart.find(pd => pd.id === product.id)
+      if(!exists){
+        product.quantity = 1;
+        newCart = [...cart, product]
+    }
+    else{
+        exists.quantity = exists.quantity + 1 ;
+        const remaining = cart.filter(pd => pd.id !== product.id);
+        newCart = [...remaining,exists];
+    }
         setCart(newCart)
         addToDb(product.id)
 

@@ -9,9 +9,19 @@ console.log(cart)
 
 let total = 0;
 let shipping = 0
+let quantity = 0 ;
 for (const product of cart){
-    total = total + product.price;
+    // 1. quantity 
+    // if(product.quantity === 0 ){
+    //     product.quantity = 1 ;
+    // }
+
+    // // 2. quantity 
+    // product.quantity = product.quantity || 1;
+    
+    total = total + product.price * product.quantity;
     shipping = shipping + product.shipping
+    quantity = quantity + product.quantity
 }
 const tex = total*7/100;
 const GrandTotal = total - tex;
@@ -19,7 +29,7 @@ const GrandTotal = total - tex;
     return (
         <div className='cart'>
         <h4>Order Summary</h4>
-        <p>selected Item: {cart.length}</p> 
+        <p>selected Item: {quantity}</p> 
         <p>Total Price: ${total} </p>
         <p>Total Shipping: {shipping} </p>
         <p>Tax: ${tex.toFixed(2)} </p>
