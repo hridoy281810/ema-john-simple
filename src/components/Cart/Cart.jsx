@@ -15,6 +15,7 @@ for (const product of cart){
 }
 const tex = total*7/100;
 const GrandTotal = total - tex;
+// localStorage.setItem(cart)
     return (
         <div className='cart'>
         <h4>Order Summary</h4>
