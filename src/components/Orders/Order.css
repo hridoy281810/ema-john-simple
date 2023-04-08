@@ -2,3 +2,18 @@
     margin: 50px auto;
     
 }
+.btn-proceed{
+    font-size: 21px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 90%;
+    margin: 10px auto;
+    background: #FF9900;
+    border-radius: 4px;
+    color: white;
+    border: none;
+}
+.cart-container a{
+    text-decoration: none;
+}
