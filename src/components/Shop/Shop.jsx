@@ -5,18 +5,43 @@ import Product from '../Product/Product';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowRight} from '@fortawesome/free-solid-svg-icons'
 import './Shop.css'
-import { Link } from 'react-router-dom';
+import { Link, useLoaderData } from 'react-router-dom';
 
 
 const Shop = () => {
     const [products,setProducts] = useState([]);
     const [cart,setCart] = useState([])
-    useEffect(()=>{
-        fetch(`products.json`)
-        .then(res => res.json())
-        .then(data => setProducts(data))
-    },[]);
+    const [itemPerPage,setItemPerPage] = useState(9)
+    const [currentPage,setCurrentPage]  = useState(0)
+    const {totalProducts} = useLoaderData()
 
+   
+    const totalPages = Math.ceil(totalProducts / itemPerPage)
+    const pageNumbers = [...Array(totalPages).keys()]
+    
+  
+    
+
+    
+    // const pageNumbers = [];
+    // for(let i = 1; i<= totalPages; i++){
+    //     pageNumbers.push(i)
+    // }
+    console.log(totalProducts)
+    // useEffect(()=>{
+    //     fetch(`http://localhost:5000/products`)
+    //     .then(res => res.json())
+    //     .then(data => setProducts(data))
+    // },[]);
+
+    useEffect(()=>{
+       async function fetchData(){
+        const response = await fetch(`http://localhost:5000/products?page=${currentPage}&limit=${itemPerPage}`);
+        const data = await response.json();
+        setProducts(data)
+       }
+       fetchData();
+    },[currentPage,itemPerPage]);
 
 
 useEffect(()=>{
@@ -25,7 +50,7 @@ useEffect(()=>{
     // step 1: get id of the addedProduct 
     for(const id in storeCart){
         // step 2: get product form products state by using id 
-      const addedProduct  = products.find(product => product.id === id);
+      const addedProduct  = products.find(product => product._id === id);
   
      if(addedProduct){
         // step 3: add quantity 
@@ -45,18 +70,18 @@ useEffect(()=>{
         // if product doesn't exist in the cart, then set quantity = 1
         // if exsit update quantity by 1 
       //   3. quantity 
-     const exists = cart.find(pd => pd.id === product.id)
+     const exists = cart.find(pd => pd._id === product._id)
       if(!exists){
         product.quantity = 1;
         newCart = [...cart, product]
     }
     else{
         exists.quantity = exists.quantity + 1 ;
-        const remaining = cart.filter(pd => pd.id !== product.id);
+        const remaining = cart.filter(pd => pd._id !== product._id);
         newCart = [...remaining,exists];
     }
         setCart(newCart)
-        addToDb(product.id)
+        addToDb(product._id)
 
      }
 
@@ -64,12 +89,21 @@ useEffect(()=>{
       setCart([])
         deleteShoppingCart()
     }
+
+    const options = [3,6,9,12,20]
+
+   const handleSelectChange = event =>{
+    setItemPerPage(parseInt(event.target.value));
+    setCurrentPage(0)
+   }
+
     return (
+       <>
         <div className='shop-container'>
         <div className="products-container">
        {
         products.map(product => <Product 
-            key={product.id}
+            key={product._id}
             product={product}
             handleAddToCart={handleAddToCart}
             >
@@ -87,6 +121,27 @@ useEffect(()=>{
   </Cart>
         </div>
         </div>
+        {/* pagination */}
+        <div className='pagination'>
+            <p>Current Pge: {currentPage} and item per page: {itemPerPage}</p>
+            {
+                pageNumbers.map(number => <button
+                className={currentPage === number ? 'selected': ''}
+                    onClick={()=> setCurrentPage(number)}
+                    key={number} >{number}</button>)
+            }
+            <select value={itemPerPage} onChange={handleSelectChange}>
+                {
+                    options.map(option =>(
+                        <option key={option} value={option}>
+                     {option}
+                        </option>
+                    ))
+                }
+
+            </select>
+        </div>
+       </>
     );
 };
 
