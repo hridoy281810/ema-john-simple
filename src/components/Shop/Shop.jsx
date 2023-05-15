@@ -14,14 +14,9 @@ const Shop = () => {
     const [itemPerPage,setItemPerPage] = useState(9)
     const [currentPage,setCurrentPage]  = useState(0)
     const {totalProducts} = useLoaderData()
-
    
     const totalPages = Math.ceil(totalProducts / itemPerPage)
     const pageNumbers = [...Array(totalPages).keys()]
-    
-  
-    
-
     
     // const pageNumbers = [];
     // for(let i = 1; i<= totalPages; i++){
@@ -46,11 +41,22 @@ const Shop = () => {
 
 useEffect(()=>{
     const storeCart = getShoppingCart()
+    const ids = Object.keys(storeCart)
+ 
+    fetch(`http://localhost:5000/productsByIds`,{
+        method: 'POST',
+        headers: {
+            'content-type': 'application/json'
+        },
+        body: JSON.stringify(ids)
+    })
+    .then(res => res.json())
+.then(cartProducts => {
     const savedCart = [];
     // step 1: get id of the addedProduct 
     for(const id in storeCart){
         // step 2: get product form products state by using id 
-      const addedProduct  = products.find(product => product._id === id);
+      const addedProduct  = cartProducts.find(product => product._id === id);
   
      if(addedProduct){
         // step 3: add quantity 
@@ -63,7 +69,10 @@ useEffect(()=>{
     }
     // step 5: set the cart 
     setCart(savedCart)
-},[products])
+})
+
+   
+},[])
 
     const handleAddToCart = (product) =>{
         let newCart = [];
